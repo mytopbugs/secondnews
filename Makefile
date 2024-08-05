@@ -22,6 +22,7 @@ start_db:
   		--env ALLOW_EMPTY_PASSWORD=yes \
   		--env MARIADB_USER=bn_myapp \
   		--env MARIADB_DATABASE=bitnami_myapp \
+		--env MARIADB_ROOT_PASSWORD=my-secret-pw \
   		--network ${laranet} \
   		--volume ${db_volume}:/bitnami/mariadb \
 		-v ./install/sql_fields.sql:/docker-entrypoint-initdb.d/sql_fields.sql \
@@ -35,8 +36,9 @@ start_laravel:
   		--env DB_DATABASE=bitnami_myapp \
   		--network ${laranet} \
 		--link ${db}:db \
-  		--volume ${PWD}/laravel_app:/app \
+  		--volume ${PWD}/my-project:/app \
   		bitnami/laravel:latest
+	@docker exec laravel php artisan migrate
 down_laravel:
 	@docker container stop laravel
 	@docker container rm laravel
