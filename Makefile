@@ -26,6 +26,20 @@ start_db:
   		--volume ${db_volume}:/bitnami/mariadb \
 		-v ./install/sql_fields.sql:/docker-entrypoint-initdb.d/sql_fields.sql \
   		bitnami/mariadb:latest
+start_laravel:
+	@docker run -d --name laravel \
+  		-p 8000:8000 \
+  		--env DB_HOST=${db} \
+  		--env DB_PORT=3306 \
+  		--env DB_USERNAME=bn_myapp \
+  		--env DB_DATABASE=bitnami_myapp \
+  		--network ${laranet} \
+		--link ${db}:db \
+  		--volume ${PWD}/laravel_app:/app \
+  		bitnami/laravel:latest
+down_laravel:
+	@docker container stop laravel
+	@docker container rm laravel
 down_network:
 	@docker network rm ${laranet}
 down_volume_db:
