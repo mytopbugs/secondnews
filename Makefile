@@ -25,8 +25,7 @@ start_db:
 		--env MARIADB_ROOT_PASSWORD=my-secret-pw \
   		--network ${laranet} \
   		--volume ${db_volume}:/bitnami/mariadb \
-		-v ./install/sql_fields.sql:/docker-entrypoint-initdb.d/sql_fields.sql \
-  		bitnami/mariadb:latest
+		bitnami/mariadb:latest
 start_laravel:
 	@docker run -d --name laravel \
   		-p 8000:8000 \
