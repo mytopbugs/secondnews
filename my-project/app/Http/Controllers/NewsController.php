@@ -6,7 +6,7 @@ use App\Models\News;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Exception;
+use App\Exceptions\InvalidParamException;
 
 class NewsController extends Controller
 {
@@ -45,7 +45,7 @@ class NewsController extends Controller
     /**
      * @param  Request  $request
      * @return JsonResponse|null
-     * @throws Exception
+     * @throws InvalidParamException
      */
     public function getNews (Request $request): ?JsonResponse {
 
@@ -69,7 +69,7 @@ class NewsController extends Controller
     /**
      * @param  int  $id
      * @return JsonResponse|null
-     * @throws Exception
+     * @throws InvalidParamException
      */
     private function getNewsItem(int $id): ?JsonResponse
     {
@@ -85,37 +85,33 @@ class NewsController extends Controller
             return response()->json( $item );
         }
     else {
-        throw new Exception('Страница не существует');
+        throw new InvalidParamException('Страница не существует');
         }
     }
 
     /**
      * @param  int  $pageNum
      * @return JsonResponse
-     * @throws Exception
+     * @throws InvalidParamException
      */
     public function getNewsList(int $pageNum): JsonResponse
     {
         if ($pageNum < 1) {
-            throw new Exception('Страница должна быть больше 0');
+            throw new InvalidParamException('Страница должна быть больше 0');
         }
 
         $news = News::all($this->fieldsListItem);
         $news = $this->addLinkItem($news);
 
         $news = $news->each(function ($item) {
-            //TODO Я подумал, что исходя из задания тут имеет значение порядок вывода
-            $item->setAttribute('creator', $item->getAttribute('author'));
-            unset($item->author);
-            $item->setAttribute('author', $item->getAttribute('creator'));
-            unset($item->creator);
+            $this->fieldsFlip($item);
         });
 
         $newsArr  = $news->toArray();
         $padeData = array_slice($newsArr, --$pageNum * $this->pageItems, $this->cntItemsPerPage);
 
         if ( count($padeData) == 0) {
-            throw new Exception('Страница вне диапазона');
+            throw new InvalidParamException('Страница вне диапазона');
         }
 
         return response()->json( $padeData );
@@ -172,7 +168,20 @@ class NewsController extends Controller
     private function createLink(News $item): News {
         $itemURL = sprintf('/api/news/?%s=%d', $this->slug, $item->getAttribute('id'));
         $item->setAttribute('linkURL', $itemURL);
+        $this->fieldsFlip($item);
 
         return $item;
+    }
+
+    /**
+     * //TODO Может это и не надо делать, но мне показалось, что на этом сделан акцент
+     * @param  News  $item
+     * @return void
+     */
+    private function fieldsFlip(News $item): void {
+        $item->setAttribute('creator', $item->getAttribute('author'));
+        unset($item->author);
+        $item->setAttribute('author', $item->getAttribute('creator'));
+        unset($item->creator);
     }
 }
