@@ -19,7 +19,7 @@ class NewsFactory extends Factory
         $content = sprintf('/%s_%d.jpg', $imgStr, $imgNum);
 
         $recommend = array(
-            [], [1,5,8], [], [4], [34, 12], [], [], [3,65]
+            [12,11,33], [1,5,8], [15,20,40], [4], [34, 12], [], [], [3,65]
         );
 
         return [
