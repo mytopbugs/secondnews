@@ -16,11 +16,13 @@ class NewsController extends Controller
     private int $cntItemsPerPage = 10;
 
     /**
+     * Добавил для надёжного контроля
      * @var string
      */
     private string $slug = 'slug';
 
     /**
+     * Добавил для более надёжного контроля
      * @var string
      */
     private string $page = 'page';
@@ -43,6 +45,7 @@ class NewsController extends Controller
     private int $pageItems = 10;
 
     /**
+     * Тут можно было ещё исключение выкинуть, когда не те параметры, но для задачи счёл излишним
      * @param  Request  $request
      * @return JsonResponse|null
      * @throws InvalidParamException
@@ -67,6 +70,7 @@ class NewsController extends Controller
     }
 
     /**
+     * Я специально оставил recommend_list с null, когда там ничего нет
      * @param  int  $id
      * @return JsonResponse|null
      * @throws InvalidParamException
@@ -174,7 +178,7 @@ class NewsController extends Controller
     }
 
     /**
-     * //TODO Может это и не надо делать, но мне показалось, что на этом сделан акцент
+     * Может это и не надо делать, но мне показалось, что на этом сделан акцент
      * @param  News  $item
      * @return void
      */

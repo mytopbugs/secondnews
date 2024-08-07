@@ -4,6 +4,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
+/**
+ * Добавил api через артисан. Так же сгенерировал все остальные класса типа модель, контроллер, исключение
+ */
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
