@@ -48,3 +48,10 @@ down_volume_db:
 down_db:
 	@docker container stop ${db}
 	@docker container rm ${db}
+kill_all:
+	@$(MAKE) down_laravel
+	@$(MAKE) all_down
+begin_all:
+	@$(MAKE) all_start
+	@$(MAKE) start_laravel
+	
