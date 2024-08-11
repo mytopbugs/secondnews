@@ -54,4 +54,7 @@ kill_all:
 begin_all:
 	@$(MAKE) all_start
 	@$(MAKE) start_laravel
-	
+open_console:
+	@docker exec -it laravel bash
+open_tinker:
+	@docker exec -it laravel php artisan tinker
