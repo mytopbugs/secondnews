@@ -28,29 +28,12 @@ class NewsController extends Controller
     private string $page = 'page';
 
     /**
-     * @var array|string[]
-     */
-    private array $fieldsListItem = [
-        'id',
-        'title',
-        'create_time',
-        'preview',
-        'preview_img',
-        'author',
-    ];
-
-    /**
-     * @var int
-     */
-    private int $pageItems = 10;
-
-    /**
      * Тут можно было ещё исключение выкинуть, когда не те параметры, но для задачи счёл излишним
      * @param  Request  $request
      * @return JsonResponse|null
      * @throws InvalidParamException
      */
-    public function getNews (Request $request): ?JsonResponse {
+    public function index (Request $request): ?JsonResponse {
 
         $existSlug = $request->has($this->slug);
         $existPage = $request->has($this->page);
@@ -60,9 +43,8 @@ class NewsController extends Controller
 
             return $this->getNewsItem($id);
         } elseif ($existPage) {
-            $page = intval($request->get($this->page));
 
-            return $this->getNewsList($page);
+            return $this->getNewsList();
         } else {
 
             return null;
@@ -81,7 +63,7 @@ class NewsController extends Controller
         $item = $news->find($id);
 
         if ($item instanceof News) {
-            $item = $this->updateItem($item);
+            $this->updateItem($item);
             $list        = json_decode($item->getAttribute('recommend_list'), true);
             $listUpdated = $this->updateList($news, $list);
             $item->setAttribute('recommend_list', $listUpdated);
@@ -94,31 +76,18 @@ class NewsController extends Controller
     }
 
     /**
-     * @param  int  $pageNum
      * @return JsonResponse
-     * @throws InvalidParamException
      */
-    public function getNewsList(int $pageNum): JsonResponse
+    public function getNewsList(): JsonResponse
     {
-        if ($pageNum < 1) {
-            throw new InvalidParamException('Страница должна быть больше 0');
-        }
-
-        $news = News::all($this->fieldsListItem);
-        $news = $this->addLinkItem($news);
+        $news = News::paginate($this->cntItemsPerPage);
 
         $news = $news->each(function ($item) {
-            $this->fieldsFlip($item);
+            $this->updateListItem($item);
+            $this->createLink($item);
         });
 
-        $newsArr  = $news->toArray();
-        $padeData = array_slice($newsArr, --$pageNum * $this->pageItems, $this->cntItemsPerPage);
-
-        if ( count($padeData) == 0) {
-            throw new InvalidParamException('Страница вне диапазона');
-        }
-
-        return response()->json( $padeData );
+        return response()->json( $news );
     }
 
     /**
@@ -142,27 +111,19 @@ class NewsController extends Controller
     }
 
     /**
-     * @param  Collection  $news
-     * @return Collection
+     * @param  News  $item
+     * @return void
      */
-    private function addLinkItem(Collection $news): Collection
-    {
-        return $news->each(function ($item) {
-
-            $item = $this->createLink($item);
-            $item->makeHidden('id');
-
-        });
+    private function updateItem (News $item): void {
+        $item->makeHidden('id', 'preview', 'preview_img');
     }
 
     /**
      * @param  News  $item
-     * @return News
+     * @return void
      */
-    private function updateItem (News $item): News {
-        $item->makeHidden('id', 'preview', 'preview_img');
-
-        return $item;
+    private function updateListItem (News $item): void {
+        $item->makeHidden('id', 'content', 'content_img', 'recommend_list');
     }
 
     /**

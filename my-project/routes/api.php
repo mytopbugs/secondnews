@@ -10,4 +10,4 @@ use App\Http\Controllers\NewsController;
  * Мне так было привычнее, так как легче отслеживать было, а потом уже заменил
  */
 
-Route::get('/news/', [NewsController::class, 'getNews']);
+Route::get('/news/', [NewsController::class, 'index']);
