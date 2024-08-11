@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static paginate(int $cntItemsPerPage)
+ * @method static truncate()
  */
 class News extends Model
 {
